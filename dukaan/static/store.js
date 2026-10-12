@@ -116,7 +116,6 @@ function renderTop() {
   $('apply').disabled = !units;
   const n = (r.budget?.live || 0) + (r.budget?.cached || 0);
   $('t-when').textContent = t('t_when', new Date(r.date).toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short' }), n);
-  $('near').innerHTML = (r.competitors || []).map((c) => `<span class="shop">${esc(c.name)}${c.rating ? ` <i>★ ${c.rating}</i>` : ''}</span>`).join('') || `<span class="muted">${t('near_empty')}</span>`;
 }
 
 function renderCats() {
@@ -291,15 +290,10 @@ function applyLang() {
   document.documentElement.lang = lang;
   for (const el of document.querySelectorAll('[data-t]')) { const v = T[lang][el.dataset.t]; if (typeof v === 'string') el.textContent = v; }
   $('q').placeholder = t('search'); $('msg').placeholder = t('msg');
-  $('lang-en').setAttribute('aria-pressed', String(lang === 'en')); $('lang-hi').setAttribute('aria-pressed', String(lang === 'hi'));
   if (!chat.length) $('chat').innerHTML = `<li class="bot">${esc(t('hello'))}</li>`;
   $('suggest').innerHTML = T[lang].suggest.map((s) => `<button type="button">${esc(s)}</button>`).join('');
-  history.replaceState(null, '', lang === 'hi' ? '/?lang=hi' : '/');
   if (state.summary) render();
 }
-$('lang-en').onclick = () => { lang = 'en'; applyLang(); };
-$('lang-hi').onclick = () => { lang = 'hi'; applyLang(); };
 
 applyLang();
 load();
-api('/api/budget').then((b) => { if (b.left != null) $("meter").textContent = t("searches_left", b.left); }).catch(() => {});

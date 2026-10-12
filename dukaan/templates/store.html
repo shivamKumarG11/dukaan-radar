@@ -12,14 +12,9 @@
 <header class="bar">
   <a class="brand" href="/">
     <span class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#120e0c" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/></svg></span>
-    <span class="brand-text"><b>{{ store.name }}</b><small>{{ store.area }} · <span data-t="tagline">Stock radar</span></small></span>
+    <span class="brand-text"><b>Dukaan Radar</b></span>
   </a>
   <div class="right">
-    <span class="meter" id="meter"></span>
-    <div class="seg" role="group" aria-label="Language">
-      <button type="button" id="lang-en" aria-pressed="{{ 'false' if lang == 'hi' else 'true' }}">EN</button>
-      <button type="button" id="lang-hi" aria-pressed="{{ 'true' if lang == 'hi' else 'false' }}">हिं</button>
-    </div>
     <button class="go" id="research" type="button" data-t="run">Run demand research</button>
   </div>
 </header>
@@ -29,10 +24,6 @@
     <div class="card map">
       <iframe title="Store location on Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
         src="https://maps.google.com/maps?q={{ store.lat }},{{ store.lng }}&z=15&output=embed"></iframe>
-      <div class="map-foot">
-        <div><b>{{ store.name }}</b><span>{{ store.address }}</span></div>
-        <div class="near" id="near"><span class="muted" data-t="near_empty">Nearby supermarkets appear after research (Google Maps via SerpApi).</span></div>
-      </div>
     </div>
 
     <div class="kpis">

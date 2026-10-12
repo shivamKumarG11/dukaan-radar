@@ -1,0 +1,302 @@
+{
+ "basmati-rice": {
+  "file": "basmati-rice.jpg",
+  "article": "Basmati",
+  "page": "https://en.wikipedia.org/wiki/Basmati",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Khyma_and_Basmati_rice.jpg/400px-Khyma_and_Basmati_rice.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "wheat-atta": {
+  "file": "wheat-atta.jpg",
+  "article": "Atta (flour)",
+  "page": "https://en.wikipedia.org/wiki/Atta_(flour)",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Atta_flour.jpg/400px-Atta_flour.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "toor-dal": {
+  "file": "toor-dal.jpg",
+  "article": "Pigeon pea",
+  "page": "https://en.wikipedia.org/wiki/Pigeon_pea",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/92/Cajanus_cajan_Blanco1.167-cropped.jpg/400px-Cajanus_cajan_Blanco1.167-cropped.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "moong-dal": {
+  "file": "moong-dal.jpg",
+  "article": "Mung bean",
+  "page": "https://en.wikipedia.org/wiki/Mung_bean",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Mung_beans_%28Vigna_radiata%29.jpg/400px-Mung_beans_%28Vigna_radiata%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "besan": {
+  "file": "besan.jpg",
+  "article": "Gram flour",
+  "page": "https://en.wikipedia.org/wiki/Gram_flour",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Gram_flour_AvL.jpg/400px-Gram_flour_AvL.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "sugar": {
+  "file": "sugar.jpg",
+  "article": "Sugar",
+  "page": "https://en.wikipedia.org/wiki/Sugar",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Sucre_blanc_cassonade_complet_rapadura.jpg/400px-Sucre_blanc_cassonade_complet_rapadura.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "salt": {
+  "file": "salt.jpg",
+  "article": "Salt",
+  "page": "https://en.wikipedia.org/wiki/Salt",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7c/Rock_salt_%28halitite%29_%28Billianwala_Salt_Member%2C_Salt_Range_Formation%2C_Ediacaran_to_Lower_Cambrian%3B_Khewra_Salt_Mine%2C_Salt_Range%2C_Pakistan%29_14.jpg/400px-Rock_salt_%28halitite%29_%28Billianwala_Salt_Member%2C_Salt_Range_Formation%2C_Ediacaran_to_Lower_Cambrian%3B_Khewra_Salt_Mine%2C_Salt_Range%2C_Pakistan%29_14.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "poha": {
+  "file": "poha.jpg",
+  "article": "Flattened rice",
+  "page": "https://en.wikipedia.org/wiki/Flattened_rice",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Poha.jpg/400px-Poha.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "rava-sooji": {
+  "file": "rava-sooji.jpg",
+  "article": "Semolina",
+  "page": "https://en.wikipedia.org/wiki/Semolina",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Sa_semolina_far.jpg/400px-Sa_semolina_far.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "jaggery": {
+  "file": "jaggery.jpg",
+  "article": "Jaggery",
+  "page": "https://en.wikipedia.org/wiki/Jaggery",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Sa-indian-gud.jpg/400px-Sa-indian-gud.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "sunflower-oil": {
+  "file": "sunflower-oil.jpg",
+  "article": "Cooking oil",
+  "page": "https://en.wikipedia.org/wiki/Cooking_oil",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Olive_oil_from_Oneglia.jpg/400px-Olive_oil_from_Oneglia.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "mustard-oil": {
+  "file": "mustard-oil.jpg",
+  "article": "Mustard oil",
+  "page": "https://en.wikipedia.org/wiki/Mustard_oil",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Mustard_oil_extraction.webm/400px--Mustard_oil_extraction.webm.jpg"
+ },
+ "groundnut-oil": {
+  "file": "groundnut-oil.jpg",
+  "article": "Peanut oil",
+  "page": "https://en.wikipedia.org/wiki/Peanut_oil",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/4_gallons_of_peanut_oil.jpg/400px-4_gallons_of_peanut_oil.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "ghee": {
+  "file": "ghee.jpg",
+  "article": "Clarified butter",
+  "page": "https://en.wikipedia.org/wiki/Clarified_butter",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/Butterschmalz-2.jpg/400px-Butterschmalz-2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "milk": {
+  "file": "milk.jpg",
+  "article": "Milk",
+  "page": "https://en.wikipedia.org/wiki/Milk",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Glass_of_Milk_%2833657535532%29.jpg/400px-Glass_of_Milk_%2833657535532%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "paneer": {
+  "file": "paneer.jpg",
+  "article": "Paneer",
+  "page": "https://en.wikipedia.org/wiki/Paneer",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Panir_Paneer_Indian_cheese_fresh.jpg/400px-Panir_Paneer_Indian_cheese_fresh.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "curd": {
+  "file": "curd.jpg",
+  "article": "Dahi (curd)",
+  "page": "https://en.wikipedia.org/wiki/Dahi_(curd)",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/45/Curd_in_a_traditional_Manipuri_earthen_pot.JPG/400px-Curd_in_a_traditional_Manipuri_earthen_pot.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "butter": {
+  "file": "butter.jpg",
+  "article": "Butter",
+  "page": "https://en.wikipedia.org/wiki/Butter",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/%C5%A0v%C3%A9dsk%C3%BD_kol%C3%A1%C4%8D_naruby_904_%28cropped%29.JPG/400px-%C5%A0v%C3%A9dsk%C3%BD_kol%C3%A1%C4%8D_naruby_904_%28cropped%29.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "bread": {
+  "file": "bread.jpg",
+  "article": "Bread",
+  "page": "https://en.wikipedia.org/wiki/Bread",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Korb_mit_Br%C3%B6tchen.JPG/400px-Korb_mit_Br%C3%B6tchen.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "eggs": {
+  "file": "eggs.jpg",
+  "article": "Eggs as food",
+  "page": "https://en.wikipedia.org/wiki/Eggs_as_food",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Huevo_frito.jpg/400px-Huevo_frito.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "onion": {
+  "file": "onion.jpg",
+  "article": "Onion",
+  "page": "https://en.wikipedia.org/wiki/Onion",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Mixed_onions.jpg/400px-Mixed_onions.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "potato": {
+  "file": "potato.jpg",
+  "article": "Potato",
+  "page": "https://en.wikipedia.org/wiki/Potato",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Patates.jpg/400px-Patates.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "tomato": {
+  "file": "tomato.jpg",
+  "article": "Tomato",
+  "page": "https://en.wikipedia.org/wiki/Tomato",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/89/Tomato_je.jpg/400px-Tomato_je.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "banana": {
+  "file": "banana.jpg",
+  "article": "Banana",
+  "page": "https://en.wikipedia.org/wiki/Banana",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Bananavarieties.jpg/400px-Bananavarieties.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "apple": {
+  "file": "apple.jpg",
+  "article": "Apple",
+  "page": "https://en.wikipedia.org/wiki/Apple",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Pink_lady_and_cross_section.jpg/400px-Pink_lady_and_cross_section.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "lemon": {
+  "file": "lemon.jpg",
+  "article": "Lemon",
+  "page": "https://en.wikipedia.org/wiki/Lemon",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/P1030323.JPG/400px-P1030323.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "green-chilli": {
+  "file": "green-chilli.jpg",
+  "article": "Chili pepper",
+  "page": "https://en.wikipedia.org/wiki/Chili_pepper",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Madame_Jeanette_and_other_chillies.jpg/400px-Madame_Jeanette_and_other_chillies.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "coriander": {
+  "file": "coriander.jpg",
+  "article": "Coriander",
+  "page": "https://en.wikipedia.org/wiki/Coriander",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Coriandrum_sativum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-193.jpg/400px-Coriandrum_sativum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-193.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "namkeen": {
+  "file": "namkeen.jpg",
+  "article": "Namkeen",
+  "page": "https://en.wikipedia.org/wiki/Namkeen",
+  "image": "https://upload.wikimedia.org/wikipedia/en/a/a7/Namkeen_poster.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+ },
+ "chakli": {
+  "file": "chakli.jpg",
+  "article": "Chakli",
+  "page": "https://en.wikipedia.org/wiki/Chakli",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/Chakli_in_a_bowl.jpg/400px-Chakli_in_a_bowl.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "soan-papdi": {
+  "file": "soan-papdi.jpg",
+  "article": "Soan papdi",
+  "page": "https://en.wikipedia.org/wiki/Soan_papdi",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Son_papadi.jpg/400px-Son_papadi.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "kaju-katli": {
+  "file": "kaju-katli.jpg",
+  "article": "Kaju katli",
+  "page": "https://en.wikipedia.org/wiki/Kaju_katli",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Kaju_katli_sweet.jpg/400px-Kaju_katli_sweet.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "biscuits": {
+  "file": "biscuits.jpg",
+  "article": "Biscuit",
+  "page": "https://en.wikipedia.org/wiki/Biscuit",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b4/Bourbon_and_Custard_Cream.jpeg/400px-Bourbon_and_Custard_Cream.jpeg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "chocolate-gift-box": {
+  "file": "chocolate-gift-box.jpg",
+  "article": "Chocolate",
+  "page": "https://en.wikipedia.org/wiki/Chocolate",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/Three_Bars_%281%29.jpg/400px-Three_Bars_%281%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "almonds": {
+  "file": "almonds.jpg",
+  "article": "Almond",
+  "page": "https://en.wikipedia.org/wiki/Almond",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Almonds_-_in_shell%2C_shell_cracked_open%2C_shelled%2C_blanched.jpg/400px-Almonds_-_in_shell%2C_shell_cracked_open%2C_shelled%2C_blanched.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "tea": {
+  "file": "tea.jpg",
+  "article": "Tea",
+  "page": "https://en.wikipedia.org/wiki/Tea",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Longjing_tea_steeping_in_gaiwan.jpg/400px-Longjing_tea_steeping_in_gaiwan.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "coffee": {
+  "file": "coffee.jpg",
+  "article": "Coffee",
+  "page": "https://en.wikipedia.org/wiki/Coffee",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Latte_and_dark_coffee.jpg/400px-Latte_and_dark_coffee.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "cold-drink": {
+  "file": "cold-drink.jpg",
+  "article": "Soft drink",
+  "page": "https://en.wikipedia.org/wiki/Soft_drink",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Tumbler_of_cola_with_ice.jpg/400px-Tumbler_of_cola_with_ice.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "packaged-water": {
+  "file": "packaged-water.jpg",
+  "article": "Bottled water",
+  "page": "https://en.wikipedia.org/wiki/Bottled_water",
+  "image": "https://upload.wikimedia.org/wikipedia/commons/0/02/Stilles_Mineralwasser.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled"
+ },
+ "detergent-powder": {
+  "file": "detergent-powder.jpg",
+  "article": "Laundry detergent",
+  "page": "https://en.wikipedia.org/wiki/Laundry_detergent",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Pralni_pra%C5%A1ek.JPG/400px-Pralni_pra%C5%A1ek.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "dishwash-bar": {
+  "file": "dishwash-bar.jpg",
+  "article": "Dishwashing",
+  "page": "https://en.wikipedia.org/wiki/Dishwashing",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Bundesarchiv_Bild_183-12913-0005%2C_Berlin%2C_Abwaschen.jpg/400px-Bundesarchiv_Bild_183-12913-0005%2C_Berlin%2C_Abwaschen.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "agarbatti": {
+  "file": "agarbatti.jpg",
+  "article": "Incense",
+  "page": "https://en.wikipedia.org/wiki/Incense",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/R%C3%B6kelse_SSB_Helga_Trefaldighet_gif.gif/400px-R%C3%B6kelse_SSB_Helga_Trefaldighet_gif.gif?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "floor-cleaner": {
+  "file": "floor-cleaner.jpg",
+  "article": "Cleaning agent",
+  "page": "https://en.wikipedia.org/wiki/Cleaning_agent",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Vacuum_Clean.jpg/400px-Vacuum_Clean.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "led-bulb": {
+  "file": "led-bulb.jpg",
+  "article": "LED lamp",
+  "page": "https://en.wikipedia.org/wiki/LED_lamp",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Led-lampa.jpg/400px-Led-lampa.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "diyas": {
+  "file": "diyas.jpg",
+  "article": "Diya (lamp)",
+  "page": "https://en.wikipedia.org/wiki/Diya_(lamp)",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Diya_set_in_a_rangoli.jpg/400px-Diya_set_in_a_rangoli.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "rangoli-colours": {
+  "file": "rangoli-colours.jpg",
+  "article": "Rangoli",
+  "page": "https://en.wikipedia.org/wiki/Rangoli",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Diya_deepak_Diwali_rangoli_in_goa.JPG/400px-Diya_deepak_Diwali_rangoli_in_goa.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "akash-kandil": {
+  "file": "akash-kandil.jpg",
+  "article": "Lantern",
+  "page": "https://en.wikipedia.org/wiki/Lantern",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/CNW_brakeman%27s_kerosene_lantern.JPG/400px-CNW_brakeman%27s_kerosene_lantern.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "pooja-thali": {
+  "file": "pooja-thali.jpg",
+  "article": "Arti (Hinduism)",
+  "page": "https://en.wikipedia.org/wiki/Arti_(Hinduism)",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/%281%29_Aarti_Thali%2C_Prayer_Plate_India.jpg/400px-%281%29_Aarti_Thali%2C_Prayer_Plate_India.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "diwali-lights": {
+  "file": "diwali-lights.jpg",
+  "article": "Holiday lighting technology",
+  "page": "https://en.wikipedia.org/wiki/Holiday_lighting_technology",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Suburban_Christmaslights.JPG/400px-Suburban_Christmaslights.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ },
+ "gift-hamper": {
+  "file": "gift-hamper.jpg",
+  "article": "Gift basket",
+  "page": "https://en.wikipedia.org/wiki/Gift_basket",
+  "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Wrapped_fruit_basket.jpg/400px-Wrapped_fruit_basket.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+ }
+}

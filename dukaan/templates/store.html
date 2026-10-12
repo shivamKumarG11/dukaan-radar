@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dukaan Radar · {{ store.name }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hind:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/store.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/">
+    <span class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#120e0c" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/></svg></span>
+    <span class="brand-text"><b>{{ store.name }}</b><small>{{ store.area }} · <span data-t="tagline">Stock radar</span></small></span>
+  </a>
+  <div class="right">
+    <span class="meter" id="meter"></span>
+    <div class="seg" role="group" aria-label="Language">
+      <button type="button" id="lang-en" aria-pressed="{{ 'false' if lang == 'hi' else 'true' }}">EN</button>
+      <button type="button" id="lang-hi" aria-pressed="{{ 'true' if lang == 'hi' else 'false' }}">हिं</button>
+    </div>
+    <button class="go" id="research" type="button" data-t="run">Run demand research</button>
+  </div>
+</header>
+
+<main class="page">
+  <section class="top">
+    <div class="card map">
+      <iframe title="Store location on Google Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://maps.google.com/maps?q={{ store.lat }},{{ store.lng }}&z=15&output=embed"></iframe>
+      <div class="map-foot">
+        <div><b>{{ store.name }}</b><span>{{ store.address }}</span></div>
+        <div class="near" id="near"><span class="muted" data-t="near_empty">Nearby supermarkets appear after research (Google Maps via SerpApi).</span></div>
+      </div>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><span data-t="k_items">Items</span><b id="k-items">–</b><small id="k-cats"></small></div>
+      <div class="kpi"><span data-t="k_value">Stock value (cost)</span><b id="k-value">–</b><small data-t="k_value_sub">at cost price</small></div>
+      <div class="kpi warn"><span data-t="k_low">Running low</span><b id="k-low">–</b><small id="k-low-names"></small></div>
+      <div class="kpi fest"><span id="k-fest-label">Diwali</span><b id="k-fest">–</b><small id="k-fest-sub"></small></div>
+      <div class="kpi plan" id="plan">
+        <div class="plan-empty" id="plan-empty">
+          <b data-t="plan_empty_title">No research yet</b>
+          <span data-t="plan_empty">Press Run demand research. Four workers check all 50 items against live Google Trends, Shopping, News and Maps data for Mumbai.</span>
+        </div>
+        <div class="plan-full" id="plan-full" hidden>
+          <div class="plan-row">
+            <span class="pill up" id="t-up"></span><span class="pill re" id="t-re"></span><span class="pill slow" id="t-slow"></span>
+          </div>
+          <p id="t-order"></p>
+          <div class="plan-row">
+            <button class="go small" id="apply" type="button" data-t="apply">Apply all orders</button>
+            <button class="ghost small" id="replay" type="button" data-t="replay">Watch the research</button>
+          </div>
+          <small class="muted" id="t-when"></small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="body">
+    <div class="stock">
+      <div class="stock-head">
+        <h1 data-t="stock">Stock</h1>
+        <input id="q" type="search" placeholder="Search items" aria-label="Search items">
+        <div class="seg filter" role="group" aria-label="Show">
+          <button type="button" id="f-all" aria-pressed="true" data-t="f_all">All</button>
+          <button type="button" id="f-act" aria-pressed="false" data-t="f_act">Needs action</button>
+        </div>
+        <button class="ghost" id="add" type="button" data-t="add">+ Add item</button>
+        <button class="link" id="reset" type="button" data-t="reset">Reset demo stock</button>
+      </div>
+      <nav class="cats" id="cats" aria-label="Categories"></nav>
+      <div id="grid" class="grid" aria-live="polite"></div>
+    </div>
+
+    <aside class="agent" aria-label="Stock agent">
+      <div class="agent-head">
+        <span class="dot" aria-hidden="true"></span>
+        <div><b data-t="agent">Stock agent</b><small data-t="agent_sub">Changes stock, reads the research, checks live prices and news</small></div>
+      </div>
+      <ol class="chat" id="chat" aria-live="polite"></ol>
+      <div class="chips" id="suggest"></div>
+      <form class="ask" id="ask">
+        <input id="msg" autocomplete="off" placeholder="Ask or tell the agent…" aria-label="Message the stock agent" {{ '' if agent_ready else 'disabled' }}>
+        <button class="go" type="submit" aria-label="Send" {{ '' if agent_ready else 'disabled' }}>➤</button>
+      </form>
+      {% if not agent_ready %}<p class="note">Add <code>TOKENROUTER_API_KEY</code> to <code>.env</code> to switch the agent on.</p>{% endif %}
+    </aside>
+  </section>
+  {% if demo %}<p class="note foot">Demo mode: SerpApi searches are replayed from a recording of this store's research. Add <code>SERPAPI_API_KEY</code> to <code>.env</code> to research live.</p>{% endif %}
+  <p class="note foot">Product photos: Wikipedia / Wikimedia Commons (see <a href="/static/items/credits.json">credits</a>).</p>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <iframe id="room" title="Research Room"></iframe>
+  <button class="go close" id="close" type="button" data-t="close_busy">Back to the store</button>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="item-form">
+    <h2 id="dlg-title">Add item</h2>
+    <div class="fields">
+      <label class="wide"><span data-t="fl_name">Name</span><input name="name" required></label>
+      <label><span data-t="fl_hindi">Hindi name</span><input name="hindi"></label>
+      <label><span data-t="fl_cat">Category</span><select name="category"></select></label>
+      <label><span data-t="fl_unit">Unit</span><input name="unit" placeholder="1 kg"></label>
+      <label><span data-t="fl_qty">In stock</span><input name="qty" type="number" min="0" required></label>
+      <label><span data-t="fl_reorder">Normal weekly stock</span><input name="reorder" type="number" min="0"></label>
+      <label><span data-t="fl_cost">Cost ₹</span><input name="cost" type="number" min="0" step="0.5"></label>
+      <label><span data-t="fl_price">Price ₹</span><input name="price" type="number" min="0" step="0.5"></label>
+      <label class="wide"><span data-t="fl_term">What people Google for it</span><input name="term" placeholder="e.g. basmati rice"></label>
+    </div>
+    <div class="dlg-actions">
+      <button class="ghost" value="cancel" formnovalidate data-t="cancel">Cancel</button>
+      <button class="go" value="save" data-t="save">Save</button>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>window.DR = {lang: "{{ lang }}"};</script>
+<script src="/static/store.js"></script>
+</body>
+</html>

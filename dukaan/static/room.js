@@ -1,5 +1,6 @@
 // Dukaan Radar Research Room: workers run real SerpApi searches, Munshi writes the plan.
-// Events stream from /api/run (one per search start/finish, then the report).
+// Events stream from /api/research (one per search start/finish, then the report).
+// Inside the store page (iframe, ?autostart=1) it starts by itself and tells the page when the plan is ready.
 import * as THREE from 'three';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
@@ -21,8 +22,8 @@ const ACTION = {
   hi: { stock_now: 'अभी मंगाएँ', last_call: 'आखिरी मौका', at_peak: 'चरम पर', cooling: 'घट रहा', watch: 'नज़र रखें' },
 };
 const UI = {
-  en: { ready: 'READY', searching: 'SEARCHING…', found: 'FOUND', idle: 'Waiting for a shop to research', title: "Today's stock plan", start: 'Start research', busy: 'Researching…', again: 'Research again', board: 'Press Start research', writing: 'WRITING THE PLAN', done: 'PLAN READY' },
-  hi: { ready: 'तैयार', searching: 'खोज रहे हैं…', found: 'मिल गया', idle: 'दुकान चुनने का इंतज़ार', title: 'आज का स्टॉक प्लान', start: 'रिसर्च शुरू करें', busy: 'रिसर्च चल रही है…', again: 'फिर से रिसर्च करें', board: 'रिसर्च शुरू करें दबाएँ', writing: 'प्लान लिख रहे हैं', done: 'प्लान तैयार' },
+  en: { ready: 'READY', searching: 'SEARCHING…', found: 'FOUND', idle: 'Waiting to research the store', title: "Today's stock plan", start: 'Start research', busy: 'Researching…', again: 'Research again', board: 'Press Start research', writing: 'WRITING THE PLAN', done: 'PLAN READY' },
+  hi: { ready: 'तैयार', searching: 'खोज रहे हैं…', found: 'मिल गया', idle: 'रिसर्च का इंतज़ार', title: 'आज का स्टॉक प्लान', start: 'रिसर्च शुरू करें', busy: 'रिसर्च चल रही है…', again: 'फिर से रिसर्च करें', board: 'रिसर्च शुरू करें दबाएँ', writing: 'प्लान लिख रहे हैं', done: 'प्लान तैयार' },
 };
 const t = (k) => UI[lang][k];
 const wname = (w) => (lang === 'hi' ? w.hi : w.name);
@@ -186,6 +187,7 @@ function frame() {
   mb.position.x = munshi.grp.position.x; mt.position.x = munshi.grp.position.x;
   renderer.render(scene, camera); labels.render(scene, camera);
   requestAnimationFrame(frame);
+if (new URLSearchParams(location.search).get('autostart') === '1') $('pick').requestSubmit();
 }
 
 // ---------- evidence flights ----------
@@ -214,11 +216,12 @@ function queryText(l) {
   const city = (l.location || '').split(',')[0];
   if (l.engine === 'google_shopping') return `google_shopping · "${l.q}" · ${city}`;
   if (l.engine === 'google_news') return `google_news · ${l.q}`;
+  if (l.engine === 'google_maps') return 'google_maps · supermarkets near the store';
   if (l.engine === 'google_trends_trending_now') return 'trending_now · India · last 24 h';
   if (l.data_type === 'GEO_MAP_0') return `google_trends · "${l.q}" · by state`;
   if (l.data_type === 'RELATED_QUERIES') return `google_trends · rising · "${l.q}" · ${l.geo}`;
-  if (l.data_type === 'TIMESERIES' && l.date && !String(l.date).startsWith('today')) return `google_trends · ${l.geo} · last season ${String(l.date).replace(' ', ' → ')}`;
-  return `google_trends · ${l.geo} · ${l.q}`;
+  if (l.data_type === 'TIMESERIES' && l.date && !String(l.date).startsWith('today')) return `google_trends · last season · ${String(l.q).split(',').join(', ')}`;
+  return `google_trends · ${l.geo} · ${String(l.q).split(',').join(', ')}`;
 }
 function logLine(ev) {
   const w = WORKERS[ev.worker] || WORKERS.scout;
@@ -279,7 +282,7 @@ async function writePlan(r) {
   boardLines = [];
   munshiMode = 'writing';
   for (const o of Object.values(WORKERS)) o.bubbleEl.classList.add('mini');
-  setBubble(mBubble, t('writing'), `${r.city} · ${r.shop_label}`, false);
+  setBubble(mBubble, t('writing'), `${r.shop_label} · ${r.recs.length} items`, false);
   $('plan').hidden = false;
   $('plan-list').innerHTML = '';
   renderPlanHead(r);
@@ -294,15 +297,16 @@ async function writePlan(r) {
   munshiMode = 'idle';
   setBubble(mBubble, t('done'), lang === 'hi' ? `${r.picks.length} सुझाव, सबूत के साथ` : `${r.picks.length} calls, each with its evidence`, false);
   finish();
+  if (window.parent !== window) window.parent.postMessage({ type: 'research-done' }, location.origin);
 }
 
 function renderPlanHead(r) {
   $('plan-title').textContent = t('title');
   const a = r.anchor;
   $('plan-sub').textContent = lang === 'hi'
-    ? `${r.city} · ${r.shop_hi} · ${a.hi} में ${a.days} दिन`
-    : `${r.city} · ${r.shop_label} · ${a.name} in ${a.days} days`;
-  $('details').href = `/classic?city=${r.city_key}&shop=${r.shop}&lang=${lang}`;
+    ? `${r.totals.stock_up} बढ़ाएँ · ${r.totals.restock} भरें · ${a.hi} में ${a.days} दिन`
+    : `${r.totals.stock_up} to stock up · ${r.totals.restock} to restock · ${a.name} in ${a.days} days`;
+  $('details').href = `/?lang=${lang}`;
 }
 function addPlanItem(p, r) {
   const li = document.createElement('li');
@@ -314,7 +318,7 @@ function addPlanItem(p, r) {
 }
 function shareLink(r) {
   const lines = r.picks.slice(0, $('plan-list').children.length).map((p, i) => `${i + 1}. ${lang === 'hi' ? p.hi : p.name}: ${lang === 'hi' ? p.action_hi : p.action_en}`);
-  const head = lang === 'hi' ? `Dukaan Radar · ${r.city} · आज का स्टॉक प्लान` : `Dukaan Radar · ${r.city} · Today's stock plan`;
+  const head = lang === 'hi' ? `${r.shop_label} · आज का स्टॉक प्लान` : `${r.shop_label} · Today's stock plan`;
   $('share').href = 'https://wa.me/?text=' + encodeURIComponent([head, ...lines].join('\n'));
 }
 function rerenderPlan() {
@@ -342,9 +346,7 @@ $('pick').addEventListener('submit', (e) => {
   counts = { live: 0, cached: 0 }; meter();
   boardLines = []; drawBoard(lang === 'hi' ? 'कर्मचारी खोज रहे हैं…' : 'The workers are researching…');
   resetWorkers();
-  const city = $('city').value, shop = $('shop').value;
-  history.replaceState(null, '', `/?city=${city}&shop=${shop}&lang=${lang}`);
-  source = new EventSource(`/api/run?city=${city}&shop=${shop}`);
+  source = new EventSource('/api/research');
   source.onmessage = (m) => {
     const ev = JSON.parse(m.data);
     if (ev.type === 'report' || ev.type === 'error') { source.close(); source = null; }  // no auto-reconnect: a rerun would spend searches
@@ -372,3 +374,4 @@ resetWorkers();
 $('go').textContent = t('start');
 meter();
 requestAnimationFrame(frame);
+if (new URLSearchParams(location.search).get('autostart') === '1') $('pick').requestSubmit();

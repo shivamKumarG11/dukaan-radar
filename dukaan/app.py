@@ -1,82 +1,119 @@
-"""Dukaan Radar web app.   uv run uvicorn dukaan.app:app --reload   -> http://127.0.0.1:8000"""
+"""Dukaan Radar web app: one supermarket in Dadar, Mumbai.   uv run uvicorn dukaan.app:app --port 8790
+
+/            the store: map, stock, research results, stock agent
+/room        the Research Room (3D), shown while research runs
+/api/...     stock CRUD, research (server-sent events), agent chat
+"""
+import json
+import os
+import queue
+import threading
 from datetime import date
 from pathlib import Path
 
-from fastapi import FastAPI, Query, Request
-import json
-import queue
-import threading
-
+from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from . import report, serp
-from .config import CITIES, SHOP_TYPES
+from . import agent, inventory, research, serp
+from .config import ANCHOR, FESTIVALS, next_festival
+from .store_seed import STORE
 
 HERE = Path(__file__).resolve().parent
-DEMO_DAY = None
-if serp.DEMO and (HERE.parent / "demo" / "demo.json").exists():
-    import json
-    DEMO_DAY = json.loads((HERE.parent / "demo" / "demo.json").read_text())["day"]  # replay as of the recording day
-
-
-def _today(day):
-    return date.fromisoformat(day or DEMO_DAY) if (day or DEMO_DAY) else date.today()
-
+ROOT = HERE.parent
+LAST = inventory.DATA / "last_research.json"
+DEMO_DAY = json.loads((ROOT / "demo" / "demo.json").read_text())["day"] if serp.DEMO and (ROOT / "demo" / "demo.json").exists() else None
 
 app = FastAPI(title="Dukaan Radar")
 app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
 templates = Jinja2Templates(directory=HERE / "templates")
 
 
-def spark_paths(values, w=280, h=60):
-    """SVG line and area paths for a sparkline (values 0-100)."""
-    if not values:
-        return "", ""
-    top = max(max(values), 1)
-    step = w / max(len(values) - 1, 1)
-    pts = [(round(i * step, 1), round(h - 4 - (v / top) * (h - 8), 1)) for i, v in enumerate(values)]
-    line = "M" + " L".join(f"{x},{y}" for x, y in pts)
-    return line, f"{line} L{w},{h} L0,{h} Z"
+def _today():
+    return date.fromisoformat(DEMO_DAY) if DEMO_DAY else date.today()
 
 
-templates.env.globals.update(spark_paths=spark_paths)
-
-
-def _report(city, shop, today):
-    if city not in CITIES:
-        city = "pune"
-    if shop not in SHOP_TYPES:
-        shop = "gifts"
-    return report.build(city, shop, today=today)
-
-
-def _ctx(request, city, shop, lang, today):
-    return dict(request=request, r=_report(city, shop, today), lang=lang if lang in ("en", "hi") else "en",
-                cities=CITIES, shops=SHOP_TYPES, demo=serp.DEMO)
+def _load_last():
+    if not agent.LAST_RESEARCH and LAST.exists():
+        agent.LAST_RESEARCH.update(json.loads(LAST.read_text(encoding="utf-8")))
+    return agent.LAST_RESEARCH
 
 
 @app.get("/", response_class=HTMLResponse)
-def room(request: Request, city: str = "pune", shop: str = "gifts", lang: str = "en"):
-    """The Research Room: watch the workers research, then take the plan."""
-    return templates.TemplateResponse(request, "room.html", dict(
-        request=request, city=city if city in CITIES else "pune", shop=shop if shop in SHOP_TYPES else "gifts",
-        lang=lang if lang in ("en", "hi") else "en", cities=CITIES, shops=SHOP_TYPES, demo=serp.DEMO))
+def store_page(request: Request, lang: str = "en"):
+    return templates.TemplateResponse(request, "store.html", dict(
+        request=request, store=STORE, lang="hi" if lang == "hi" else "en", demo=serp.DEMO,
+        agent_ready=bool(os.environ.get("TOKENROUTER_API_KEY"))))
 
 
-@app.get("/api/run")
-def api_run(city: str = "pune", shop: str = "gifts", day: str | None = None):
-    """Server-sent events: every search as a worker starts and finishes it, then the full report."""
-    city = city if city in CITIES else "pune"
-    shop = shop if shop in SHOP_TYPES else "gifts"
+@app.get("/room", response_class=HTMLResponse)
+def room(request: Request, lang: str = "en"):
+    return templates.TemplateResponse(request, "room.html", dict(request=request, store=STORE, lang="hi" if lang == "hi" else "en", demo=serp.DEMO))
+
+
+# ---------- stock ----------
+@app.get("/api/store")
+def api_store():
+    today = _today()
+    when, name, hi = next_festival(today) or FESTIVALS[ANCHOR]
+    return dict(summary=inventory.summary(), items=inventory.items(), research=_load_last() or None,
+                today=today.isoformat(), festival=dict(name=name, hi=hi, date=when.isoformat(), days=(when - today).days),
+                diwali=(FESTIVALS[ANCHOR][0] - today).days)
+
+
+@app.post("/api/orders/apply")
+def api_apply(body: dict = Body(default={})):
+    _load_last()
+    actions = []
+    done = agent.apply_orders(body.get("names"), actions)
+    return dict(done=done, actions=actions)
+
+
+@app.post("/api/items")
+def api_add(item: dict = Body(...)):
+    try:
+        return inventory.add(item.get("name", ""), item.get("category", "Staples"), item.get("unit", "unit"),
+                             int(item.get("qty") or 0), item.get("reorder"), item.get("cost") or 0,
+                             item.get("price") or 0, item.get("term"), item.get("hindi") or "")
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.patch("/api/items/{item_id}")
+def api_update(item_id: int, changes: dict = Body(...)):
+    if not inventory.find(item_id):
+        raise HTTPException(404, "no such item")
+    return inventory.update(item_id, **changes)
+
+
+@app.delete("/api/items/{item_id}")
+def api_delete(item_id: int):
+    inventory.remove(item_id)
+    return {"ok": True}
+
+
+@app.post("/api/store/reset")
+def api_reset():
+    inventory.reset()
+    return {"ok": True}
+
+
+# ---------- research ----------
+@app.get("/api/research")
+def api_research():
+    """Server-sent events: each search as a worker starts and finishes it, then the full report."""
     events = queue.Queue()
 
     def work():
         try:
-            r = report.build(city, shop, today=_today(day), listener=events.put)
+            r = research.build(today=_today(), listener=events.put)
+            agent.LAST_RESEARCH.clear()
+            agent.LAST_RESEARCH.update(r)
+            LAST.parent.mkdir(parents=True, exist_ok=True)
+            LAST.write_text(json.dumps(r, ensure_ascii=False, default=str), encoding="utf-8")
             events.put(dict(type="report", report=r))
-        except Exception as e:  # surfaced to the page
+        except Exception as e:
             events.put(dict(type="error", message=str(e)))
         events.put(None)
 
@@ -89,22 +126,16 @@ def api_run(city: str = "pune", shop: str = "gifts", day: str | None = None):
     return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
 
 
-@app.get("/classic", response_class=HTMLResponse)
-def dashboard(request: Request, city: str = "pune", shop: str = "gifts", lang: str = "en", day: str | None = None):
-    today = _today(day)
-    return templates.TemplateResponse(request, "dashboard.html", _ctx(request, city, shop, lang, today))
-
-
-@app.get("/brief", response_class=HTMLResponse)
-def brief(request: Request, city: str = "pune", shop: str = "gifts", lang: str = "hi", day: str | None = None):
-    today = _today(day)
-    return templates.TemplateResponse(request, "brief.html", _ctx(request, city, shop, lang, today))
-
-
-@app.get("/api/report")
-def api_report(city: str = "pune", shop: str = "gifts", day: str | None = None):
-    today = _today(day)
-    return JSONResponse(_report(city, shop, today))
+# ---------- agent ----------
+@app.post("/api/agent")
+def api_agent(body: dict = Body(...)):
+    if not os.environ.get("TOKENROUTER_API_KEY"):
+        return dict(reply="The stock agent needs TOKENROUTER_API_KEY in .env (any OpenAI-compatible model works).", actions=[], trace=[])
+    _load_last()
+    try:
+        return agent.chat(body.get("messages", []))
+    except Exception as e:
+        return dict(reply=f"Sorry, the agent hit an error: {e}", actions=[], trace=[])
 
 
 @app.get("/api/budget")

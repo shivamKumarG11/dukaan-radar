@@ -1,4 +1,4 @@
-"""Full reports rebuilt from the bundled demo data: no API key, no live searches."""
+"""The bundled demo data replayed: no API key, no live searches, a fresh store in a temp folder."""
 import os
 import subprocess
 import sys
@@ -8,8 +8,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run(code):
-    env = {**os.environ, "DUKAAN_DEMO": "1", "SERPAPI_API_KEY": "", "PYTHONIOENCODING": "utf-8"}
+def run(code, tmp_path=None):
+    env = {**os.environ, "DUKAAN_DEMO": "1", "SERPAPI_API_KEY": "", "TOKENROUTER_API_KEY": "", "PYTHONIOENCODING": "utf-8"}
+    if tmp_path:
+        env["DUKAAN_DATA"] = str(tmp_path)
     return subprocess.run([sys.executable, "-c", code], cwd=ROOT, env=env, capture_output=True, text=True, timeout=120)
 
 
@@ -30,16 +32,24 @@ print('ok')
     assert out.returncode == 0, out.stderr[-2000:]
 
 
-def test_web_pages_render_in_demo_mode():
+def test_store_pages_and_stock_editing(tmp_path):
     out = run("""
 from fastapi.testclient import TestClient
 from dukaan.app import app
 c = TestClient(app)
-for path in ['/?city=pune&shop=gifts', '/?city=pune&shop=gifts&lang=hi', '/brief?city=delhi&shop=electronics', '/api/report?city=patna&shop=gifts']:
-    r = c.get(path); assert r.status_code == 200, path
-assert 'Demo mode' in c.get('/').text and 'आज का स्टॉक प्लान' in c.get('/brief').text
+assert 'Dukaan Radar Mart' in c.get('/').text and 'Demo mode' in c.get('/').text
+assert c.get('/?lang=hi').status_code == 200 and 'Research Room' in c.get('/room').text
+s = c.get('/api/store').json()
+assert len(s['items']) == 50 and s['research'] is None and s['diwali'] == 27
+new = c.post('/api/items', json={'name': 'Kesar', 'category': 'Festive & pooja', 'unit': '1 g', 'qty': 4}).json()
+assert c.post('/api/items', json={'name': 'kesar', 'category': 'Staples', 'qty': 1}).status_code == 400
+assert c.patch(f"/api/items/{new['id']}", json={'qty': 9, 'price': 250}).json()['qty'] == 9
+assert c.patch(f"/api/items/{new['id']}", json={'qty': -3}).json()['qty'] == 0
+c.delete(f"/api/items/{new['id']}")
+assert len(c.get('/api/store').json()['items']) == 50
+assert 'TOKENROUTER_API_KEY' in c.post('/api/agent', json={'messages': [{'role': 'user', 'content': 'hi'}]}).json()['reply']
 print('ok')
-""")
+""", tmp_path)
     assert out.returncode == 0, out.stderr[-2000:]
 
 
@@ -53,17 +63,25 @@ def test_no_api_key_in_shipped_files():
     assert not leaks, f"API key found in {leaks}"
 
 
-def test_research_room_stream():
+def test_store_research_stream_and_orders(tmp_path):
     out = run("""
 import json
 from fastapi.testclient import TestClient
 from dukaan.app import app
 c = TestClient(app)
-assert 'Research Room' in c.get('/').text and c.get('/classic').status_code == 200
-events = [json.loads(l[6:]) for l in c.get('/api/run?city=pune&shop=gifts').text.splitlines() if l.startswith('data: ')]
-searches = [e for e in events if e['type'] == 'search']
-assert len(searches) == 24 and {e['worker'] for e in searches} == {'scout', 'historian', 'price', 'news'}
-assert events[-1]['type'] == 'report' and len(events[-1]['report']['picks']) == 4
+events = [json.loads(l[6:]) for l in c.get('/api/research').text.splitlines() if l.startswith('data: ')]
+done = [e for e in events if e['type'] == 'search' and e['phase'] == 'done']
+assert len(done) == 28 and all(e['source'] == 'cache' for e in done)
+assert {e['worker'] for e in done} == {'scout', 'historian', 'price', 'news'}
+r = events[-1]['report']
+assert events[-1]['type'] == 'report' and not r['errors'] and len(r['recs']) == 50
+assert r['totals']['stock_up'] >= 10 and r['totals']['restock'] >= 3 and len(r['competitors']) >= 5
+assert {p['stock'] for p in r['recs'] if p['category'] == 'Staples' and p['name'] == 'Salt'} <= {'ok', 'slow'}
+assert all(p['action_en'] and p['action_hi'] for p in r['recs'])
+assert c.get('/api/store').json()['research']['date'] == '2026-10-12'
+applied = c.post('/api/orders/apply', json={}).json()
+assert len(applied['done']) == r['totals']['stock_up'] + r['totals']['restock']
+assert c.post('/api/orders/apply', json={}).json()['done'] == []   # a second press orders nothing more
 print('ok')
-""")
+""", tmp_path)
     assert out.returncode == 0, out.stderr[-2000:]

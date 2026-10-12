@@ -1,0 +1,31 @@
+// Drives the store page: overview, research overlay, results, needs-action filter (dev only).
+const { chromium } = require('playwright-core');
+(async () => {
+  const base = process.argv[2] || 'http://127.0.0.1:8790';
+  const b = await chromium.launch({ channel: 'msedge', headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+  const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+  const errs = [];
+  p.on('pageerror', (e) => errs.push('PAGE ' + e.message));
+  p.on('console', (m) => { if (m.type() === 'error') errs.push('CONSOLE ' + m.text()); });
+  await p.goto(base + '/');
+  await p.waitForTimeout(3000);
+  await p.screenshot({ path: 'scripts/shots/store-0.png' });
+  await p.click('#research');
+  await p.waitForTimeout(7000);
+  await p.screenshot({ path: 'scripts/shots/store-1-room.png' });
+  await p.waitForFunction(() => !document.getElementById('close').classList.contains('wait'), null, { timeout: 180000 });
+  await p.waitForTimeout(800);
+  await p.screenshot({ path: 'scripts/shots/store-2-plan.png' });
+  await p.click('#close');
+  await p.waitForTimeout(1500);
+  await p.screenshot({ path: 'scripts/shots/store-3-after.png' });
+  await p.click('#f-act');
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: 'scripts/shots/store-4-action.png', fullPage: true });
+  await p.click('#lang-hi');
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: 'scripts/shots/store-5-hi.png' });
+  console.log('plan:', (await p.locator('#plan-full').innerText()).replace(/\n/g, ' | '));
+  console.log('errors:', errs.join('\n') || 'none');
+  await b.close();
+})();

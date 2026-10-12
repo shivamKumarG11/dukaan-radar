@@ -15,13 +15,8 @@
     <span class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#120e0c" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/></svg></span>
     <b>Dukaan Radar</b>
   </a>
-  <form class="pick" id="pick" aria-label="Your shop">
-    <label>City
-      <select name="city" id="city">{% for k, c in cities.items() %}<option value="{{ k }}" {{ 'selected' if k == city }}>{{ c[0] }}</option>{% endfor %}</select>
-    </label>
-    <label>Shop
-      <select name="shop" id="shop">{% for k, s in shops.items() %}<option value="{{ k }}" {{ 'selected' if k == shop }}>{{ s.label }}</option>{% endfor %}</select>
-    </label>
+  <form class="pick" id="pick" aria-label="Research">
+    <div class="where"><b>{{ store.name }}</b><span>{{ store.area }} · 50 items</span></div>
     <button class="go" id="go" type="submit">Start research</button>
   </form>
   <div class="right">
@@ -39,7 +34,7 @@
     <div id="fly" class="fly" aria-hidden="true"></div>
     <div class="hint" id="hint">
       <b>Five workers, one job each.</b>
-      <span>Pick your city and shop, then press <em>Start research</em>. Every speech bubble is a real SerpApi search.</span>
+      <span>They check every item in the store against live Google data for Mumbai. Every speech bubble is a real SerpApi search.</span>
     </div>
   </section>
 
@@ -52,14 +47,14 @@
       <ol id="plan-list"></ol>
       <div class="plan-actions">
         <a id="share" class="btn primary" target="_blank" rel="noopener" href="#">Share on WhatsApp</a>
-        <a id="details" class="btn ghost" href="/classic">See all the evidence</a>
+        <a id="details" class="btn ghost" href="/" target="_top">Back to the store</a>
       </div>
     </section>
     <section class="log">
       <h2>Research log</h2>
       <ol id="log" aria-live="polite"></ol>
     </section>
-    {% if demo %}<p class="note">Demo mode: replaying searches recorded on 11 Oct 2026 for Pune gifts, Ahmedabad apparel, Patna gifts and Delhi electronics. Add <code>SERPAPI_API_KEY</code> to <code>.env</code> for live research anywhere.</p>{% endif %}
+    {% if demo %}<p class="note">Demo mode: replaying SerpApi searches recorded for this store. Add <code>SERPAPI_API_KEY</code> to <code>.env</code> for live research.</p>{% endif %}
   </aside>
 </main>
 <p class="sr-only" id="narrate" aria-live="polite"></p>

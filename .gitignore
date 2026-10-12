@@ -8,3 +8,5 @@ cache/*.sqlite-*
 scripts/probe_out.json
 scripts/shots/
 scripts/server.log
+data/
+scripts/research_stream.txt

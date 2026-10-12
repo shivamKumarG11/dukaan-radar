@@ -49,7 +49,7 @@ def cache_key(params):
 def worker_for(params):
     """Which Research Room worker runs this search."""
     engine = params.get("engine", "")
-    if engine == "google_shopping":
+    if engine in ("google_shopping", "google_maps"):
         return "price"
     if engine == "google_news":
         return "news"

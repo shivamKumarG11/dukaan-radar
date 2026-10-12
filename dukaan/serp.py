@@ -21,6 +21,13 @@ DEMO_CACHE = ROOT / "demo" / "serpapi-demo.sqlite"
 DEMO = os.environ.get("DUKAAN_DEMO") == "1" or (not os.environ.get("SERPAPI_API_KEY") and DEMO_CACHE.exists())
 CACHE_PATH = Path(os.environ.get("DUKAAN_CACHE") or (DEMO_CACHE if DEMO else ROOT / "cache" / "serpapi.sqlite"))
 _lock = threading.Lock()
+# Public deployments cap live searches per day (SERPAPI_DAILY_LIMIT); past it, the latest saved result is used.
+LIVE_LIMIT = int(os.environ.get("SERPAPI_DAILY_LIMIT") or 0)
+_live_today = {"day": None, "n": 0}
+if not DEMO and not CACHE_PATH.exists() and DEMO_CACHE.exists():  # a fresh server starts from the recorded searches
+    import shutil
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(DEMO_CACHE, CACHE_PATH)
 
 
 class BudgetError(RuntimeError):
@@ -106,7 +113,11 @@ def search(params, ttl_hours=12, tally=None, allow_live=None):
             tally.record(label, "cache", round((time.time() - row[1]) / 3600, 1))
         return json.loads(row[0])
     api_key = os.environ.get("SERPAPI_API_KEY")
-    if allow_live is False or not api_key or DEMO or os.environ.get("DUKAAN_OFFLINE") == "1":
+    today = time.strftime("%Y-%m-%d")
+    if _live_today["day"] != today:
+        _live_today.update(day=today, n=0)
+    over_limit = LIVE_LIMIT and _live_today["n"] >= LIVE_LIMIT
+    if allow_live is False or not api_key or DEMO or over_limit or os.environ.get("DUKAAN_OFFLINE") == "1":
         if row:  # stale but better than nothing in offline mode
             if tally:
                 tally.record(label, "cache (stale)", round((time.time() - row[1]) / 3600, 1))
@@ -114,6 +125,7 @@ def search(params, ttl_hours=12, tally=None, allow_live=None):
         raise BudgetError(f"no cached result for {label} and live searches are off")
     import serpapi
 
+    _live_today["n"] += 1
     client = serpapi.Client(api_key=api_key)
     data = dict(client.search(params))
     if "error" in data and not data.get("search_metadata"):

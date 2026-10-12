@@ -88,3 +88,6 @@ button { cursor: pointer; }
 }
 .pause { background: transparent; color: var(--text); border: 1px solid #4a3a31; padding: 0 18px; }
 .pause[aria-pressed="true"] { background: var(--text); color: var(--night); }
+
+.powered { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted); font-size: 12.5px; }
+.powered img { display: block; height: 21px; width: auto; }

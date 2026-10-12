@@ -184,10 +184,6 @@ $('grid').addEventListener('click', async (e) => {
 $('grid').addEventListener('change', (e) => { if (e.target.dataset.qty) setQty(Number(e.target.dataset.qty), Math.max(0, parseInt(e.target.value || '0', 10))); });
 $('cats').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { cat = b.dataset.cat; renderCats(); renderGrid(); } });
 $('q').addEventListener('input', renderGrid);
-for (const [id, v] of [['f-all', false], ['f-act', true]]) $(id).onclick = () => {
-  onlyAction = v; $('f-all').setAttribute('aria-pressed', String(!v)); $('f-act').setAttribute('aria-pressed', String(v)); renderGrid();
-};
-$('reset').onclick = async () => { if (confirm(t('reset_q'))) { await api('/api/store/reset', { method: 'POST' }); await load(); } };
 $('apply').onclick = async () => {
   const r = await api('/api/orders/apply', { method: 'POST', body: {} });
   toast(r.done.length ? t('applied', r.done.length) : t('nothing'));

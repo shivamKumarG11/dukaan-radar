@@ -15,6 +15,7 @@
     <span class="brand-text"><b>Dukaan Radar</b></span>
   </a>
   <div class="right">
+    <a class="powered" href="https://serpapi.com" target="_blank" rel="noopener" aria-label="Powered by SerpApi"><span>Powered by</span><img src="/static/serpapi-logo.svg" alt="SerpApi" width="84" height="21"></a>
     <button class="go" id="research" type="button" data-t="run">Run demand research</button>
   </div>
 </header>
@@ -42,12 +43,7 @@
       <div class="stock-head">
         <h1 data-t="stock">Stock</h1>
         <input id="q" type="search" placeholder="Search items" aria-label="Search items">
-        <div class="seg filter" role="group" aria-label="Show">
-          <button type="button" id="f-all" aria-pressed="true" data-t="f_all">All</button>
-          <button type="button" id="f-act" aria-pressed="false" data-t="f_act">Needs action</button>
-        </div>
         <button class="ghost" id="add" type="button" data-t="add">+ Add item</button>
-        <button class="link" id="reset" type="button" data-t="reset">Reset demo stock</button>
       </div>
       <nav class="cats" id="cats" aria-label="Categories"></nav>
       <div id="grid" class="grid" aria-live="polite"></div>

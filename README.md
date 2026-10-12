@@ -96,3 +96,11 @@ Reasons are templates in English and Hindi, so the numbers are never invented. T
 - Built during the hackathon window (from 11 Oct 2026) with AI assistance: Claude (Anthropic) helped design, write and test the code and wrote the Hindi text. The concept was drafted in Claude Design.
 - Uses SerpApi, FastAPI, three.js, OpenAI SDK (via TokenRouter) and uv.
 - MIT licence.
+
+## Deploy (Hugging Face Spaces)
+
+The `Dockerfile` runs on a Docker Space, or any container host, on port 7860. Set these as Space secrets:
+- `SERPAPI_API_KEY`: live searches. They are capped by `SERPAPI_DAILY_LIMIT` (40 a day); after that the latest saved result is used. A fresh server starts from the recorded searches.
+- `TOKENROUTER_API_KEY`: the stock agent, capped by `AGENT_DAILY_LIMIT` (150 messages a day).
+
+Without `SERPAPI_API_KEY`, the server runs in demo mode and replays the recording.

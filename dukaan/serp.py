@@ -46,13 +46,41 @@ def cache_key(params):
     return hashlib.sha256(json.dumps(clean, sort_keys=True).encode()).hexdigest()
 
 
-class Tally:
-    """Counts live and cached searches for one report."""
+def worker_for(params):
+    """Which Research Room worker runs this search."""
+    engine = params.get("engine", "")
+    if engine == "google_shopping":
+        return "price"
+    if engine == "google_news":
+        return "news"
+    if engine == "google_trends" and params.get("data_type") == "TIMESERIES" and not str(params.get("date", "")).startswith("today"):
+        return "historian"
+    return "scout"
 
-    def __init__(self):
+
+class Tally:
+    """Counts live and cached searches for one report; `listener` hears each one start and finish."""
+
+    def __init__(self, listener=None):
         self.live = 0
         self.cached = 0
         self.log = []
+        self.listener = listener
+
+    def emit(self, phase, label, **extra):
+        if self.listener:
+            self.listener(dict(type="search", phase=phase, worker=label.get("worker"), label=label, **extra))
+
+    def record(self, label, source, age_h=None):
+        if source == "live":
+            self.live += 1
+        else:
+            self.cached += 1
+        entry = dict(label, source=source)
+        if age_h is not None:
+            entry["age_h"] = age_h
+        self.log.append(entry)
+        self.emit("done", label, source=source)
 
     def as_dict(self):
         return dict(live=self.live, cached=self.cached, searches=self.log)
@@ -65,22 +93,23 @@ def search(params, ttl_hours=12, tally=None, allow_live=None):
     """
     params = {k: v for k, v in params.items() if v is not None}
     key = cache_key(params)
-    label = {k: params[k] for k in ("engine", "q", "geo", "data_type", "location") if k in params}
+    label = {k: params[k] for k in ("engine", "q", "geo", "data_type", "location", "date") if k in params}
+    label["worker"] = worker_for(params)
+    if tally:
+        tally.emit("start", label)
     with _lock:
         con = _db()
         row = con.execute("SELECT response, fetched FROM searches WHERE key = ?", (key,)).fetchone()
         con.close()
     if row and (time.time() - row[1]) < ttl_hours * 3600:
         if tally:
-            tally.cached += 1
-            tally.log.append(dict(label, source="cache", age_h=round((time.time() - row[1]) / 3600, 1)))
+            tally.record(label, "cache", round((time.time() - row[1]) / 3600, 1))
         return json.loads(row[0])
     api_key = os.environ.get("SERPAPI_API_KEY")
     if allow_live is False or not api_key or DEMO or os.environ.get("DUKAAN_OFFLINE") == "1":
         if row:  # stale but better than nothing in offline mode
             if tally:
-                tally.cached += 1
-                tally.log.append(dict(label, source="cache (stale)", age_h=round((time.time() - row[1]) / 3600, 1)))
+                tally.record(label, "cache (stale)", round((time.time() - row[1]) / 3600, 1))
             return json.loads(row[0])
         raise BudgetError(f"no cached result for {label} and live searches are off")
     import serpapi
@@ -96,8 +125,7 @@ def search(params, ttl_hours=12, tally=None, allow_live=None):
         con.commit()
         con.close()
     if tally:
-        tally.live += 1
-        tally.log.append(dict(label, source="live"))
+        tally.record(label, "live")
     return data
 
 

@@ -9,11 +9,11 @@
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="/">
+  <a class="brand" href="/?city={{ r.city_key }}&shop={{ r.shop }}&lang={{ lang }}">
     <span class="logo" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f2a93b" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/></svg></span>
     <span><b>Dukaan Radar</b><span class="small muted">{{ 'छोटी दुकानों के लिए लाइव सर्च डेटा' if hi else 'Live search data for small Indian shops' }}</span></span>
   </a>
-  <form class="controls" method="get" action="/" id="f">
+  <form class="controls" method="get" action="/classic" id="f">
     <label>{{ 'शहर' if hi else 'City' }}
       <select name="city">{% for k, c in cities.items() %}<option value="{{ k }}" {{ 'selected' if k == r.city_key }}>{{ c[0] }}</option>{% endfor %}</select>
     </label>
@@ -23,8 +23,8 @@
     <input type="hidden" name="lang" value="{{ lang }}">
     <button class="primary" type="submit">{{ 'रडार चलाएँ' if hi else 'Run radar' }}</button>
     <nav class="seg" aria-label="Language">
-      <a href="?city={{ r.city_key }}&shop={{ r.shop }}&lang=en" aria-current="{{ 'false' if hi else 'true' }}">English</a>
-      <a href="?city={{ r.city_key }}&shop={{ r.shop }}&lang=hi" aria-current="{{ 'true' if hi else 'false' }}">हिंदी</a>
+      <a href="/classic?city={{ r.city_key }}&shop={{ r.shop }}&lang=en" aria-current="{{ 'false' if hi else 'true' }}">English</a>
+      <a href="/classic?city={{ r.city_key }}&shop={{ r.shop }}&lang=hi" aria-current="{{ 'true' if hi else 'false' }}">हिंदी</a>
     </nav>
     <a class="btn ghost" href="/brief?city={{ r.city_key }}&shop={{ r.shop }}&lang=hi">{{ 'फ़ोन ब्रीफ़' if hi else 'Phone brief' }}</a>
   </form>

@@ -98,9 +98,10 @@ def _price_line(price):
     return en, hn
 
 
-def build(city="pune", shop="gifts", today=None, allow_live=None):
+def build(city="pune", shop="gifts", today=None, allow_live=None, listener=None):
+    """listener(event) hears every search start/finish (the Research Room animates from it)."""
     today = today or date.today()
-    tally = serp.Tally()
+    tally = serp.Tally(listener)
     cname, geo, location = CITIES[city]
     st = SHOP_TYPES[shop]
     products = st["products"]

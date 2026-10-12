@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="{{ 'hi' if lang == 'hi' else 'en' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dukaan Radar · Research Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Hind:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/room.css">
+<script type="importmap">{"imports": {"three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="/">
+    <span class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#120e0c" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12l6-6"/></svg></span>
+    <b>Dukaan Radar</b>
+  </a>
+  <form class="pick" id="pick" aria-label="Your shop">
+    <label>City
+      <select name="city" id="city">{% for k, c in cities.items() %}<option value="{{ k }}" {{ 'selected' if k == city }}>{{ c[0] }}</option>{% endfor %}</select>
+    </label>
+    <label>Shop
+      <select name="shop" id="shop">{% for k, s in shops.items() %}<option value="{{ k }}" {{ 'selected' if k == shop }}>{{ s.label }}</option>{% endfor %}</select>
+    </label>
+    <button class="go" id="go" type="submit">Start research</button>
+  </form>
+  <div class="right">
+    <span class="meter" id="meter" aria-live="polite"></span>
+    <div class="seg" role="group" aria-label="Language">
+      <button type="button" id="lang-en" aria-pressed="{{ 'false' if lang == 'hi' else 'true' }}">EN</button>
+      <button type="button" id="lang-hi" aria-pressed="{{ 'true' if lang == 'hi' else 'false' }}">हिं</button>
+    </div>
+  </div>
+</header>
+
+<main class="room">
+  <section class="stage" aria-label="Research room">
+    <div id="scene" class="scene" aria-hidden="true"></div>
+    <div id="fly" class="fly" aria-hidden="true"></div>
+    <div class="hint" id="hint">
+      <b>Five workers, one job each.</b>
+      <span>Pick your city and shop, then press <em>Start research</em>. Every speech bubble is a real SerpApi search.</span>
+    </div>
+  </section>
+
+  <aside class="side" aria-label="Research log and plan">
+    <section class="plan" id="plan" hidden>
+      <div class="plan-head">
+        <h1 id="plan-title">Today's stock plan</h1>
+        <span id="plan-sub" class="muted"></span>
+      </div>
+      <ol id="plan-list"></ol>
+      <div class="plan-actions">
+        <a id="share" class="btn primary" target="_blank" rel="noopener" href="#">Share on WhatsApp</a>
+        <a id="details" class="btn ghost" href="/classic">See all the evidence</a>
+      </div>
+    </section>
+    <section class="log">
+      <h2>Research log</h2>
+      <ol id="log" aria-live="polite"></ol>
+    </section>
+    {% if demo %}<p class="note">Demo mode: replaying searches recorded on 11 Oct 2026 for Pune gifts, Ahmedabad apparel, Patna gifts and Delhi electronics. Add <code>SERPAPI_API_KEY</code> to <code>.env</code> for live research anywhere.</p>{% endif %}
+  </aside>
+</main>
+<p class="sr-only" id="narrate" aria-live="polite"></p>
+<script type="module" src="/static/room.js"></script>
+</body>
+</html>

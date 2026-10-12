@@ -3,7 +3,11 @@ from datetime import date
 from pathlib import Path
 
 from fastapi import FastAPI, Query, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+import json
+import queue
+import threading
+
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -54,6 +58,38 @@ def _ctx(request, city, shop, lang, today):
 
 
 @app.get("/", response_class=HTMLResponse)
+def room(request: Request, city: str = "pune", shop: str = "gifts", lang: str = "en"):
+    """The Research Room: watch the workers research, then take the plan."""
+    return templates.TemplateResponse(request, "room.html", dict(
+        request=request, city=city if city in CITIES else "pune", shop=shop if shop in SHOP_TYPES else "gifts",
+        lang=lang if lang in ("en", "hi") else "en", cities=CITIES, shops=SHOP_TYPES, demo=serp.DEMO))
+
+
+@app.get("/api/run")
+def api_run(city: str = "pune", shop: str = "gifts", day: str | None = None):
+    """Server-sent events: every search as a worker starts and finishes it, then the full report."""
+    city = city if city in CITIES else "pune"
+    shop = shop if shop in SHOP_TYPES else "gifts"
+    events = queue.Queue()
+
+    def work():
+        try:
+            r = report.build(city, shop, today=_today(day), listener=events.put)
+            events.put(dict(type="report", report=r))
+        except Exception as e:  # surfaced to the page
+            events.put(dict(type="error", message=str(e)))
+        events.put(None)
+
+    threading.Thread(target=work, daemon=True).start()
+
+    def stream():
+        while (ev := events.get()) is not None:
+            yield "data: " + json.dumps(ev, ensure_ascii=False, default=str) + "\n\n"
+
+    return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
+
+
+@app.get("/classic", response_class=HTMLResponse)
 def dashboard(request: Request, city: str = "pune", shop: str = "gifts", lang: str = "en", day: str | None = None):
     today = _today(day)
     return templates.TemplateResponse(request, "dashboard.html", _ctx(request, city, shop, lang, today))

@@ -51,3 +51,19 @@ def test_no_api_key_in_shipped_files():
     tracked = subprocess.run(["git", "ls-files", "-co", "--exclude-standard"], cwd=ROOT, capture_output=True, text=True).stdout.split()
     leaks = [f for f in tracked if key.encode() in (ROOT / f).read_bytes()]
     assert not leaks, f"API key found in {leaks}"
+
+
+def test_research_room_stream():
+    out = run("""
+import json
+from fastapi.testclient import TestClient
+from dukaan.app import app
+c = TestClient(app)
+assert 'Research Room' in c.get('/').text and c.get('/classic').status_code == 200
+events = [json.loads(l[6:]) for l in c.get('/api/run?city=pune&shop=gifts').text.splitlines() if l.startswith('data: ')]
+searches = [e for e in events if e['type'] == 'search']
+assert len(searches) == 24 and {e['worker'] for e in searches} == {'scout', 'historian', 'price', 'news'}
+assert events[-1]['type'] == 'report' and len(events[-1]['report']['picks']) == 4
+print('ok')
+""")
+    assert out.returncode == 0, out.stderr[-2000:]

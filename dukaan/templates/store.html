@@ -27,29 +27,15 @@
     </div>
 
     <div class="kpis">
-      <div class="kpi"><span data-t="k_items">Items</span><b id="k-items">–</b><small id="k-cats"></small></div>
-      <div class="kpi"><span data-t="k_value">Stock value (cost)</span><b id="k-value">–</b><small data-t="k_value_sub">at cost price</small></div>
+      <div class="kpi"><span data-t="k_value">Stock worth</span><b id="k-value">–</b><small id="k-items"></small></div>
       <div class="kpi warn"><span data-t="k_low">Running low</span><b id="k-low">–</b><small id="k-low-names"></small></div>
-      <div class="kpi fest"><span id="k-fest-label">Diwali</span><b id="k-fest">–</b><small id="k-fest-sub"></small></div>
-      <div class="kpi plan" id="plan">
-        <div class="plan-empty" id="plan-empty">
-          <b data-t="plan_empty_title">No research yet</b>
-          <span data-t="plan_empty">Press Run demand research. Four workers check all 50 items against live Google Trends, Shopping, News and Maps data for Mumbai.</span>
-        </div>
-        <div class="plan-full" id="plan-full" hidden>
-          <div class="plan-row">
-            <span class="pill up" id="t-up"></span><span class="pill re" id="t-re"></span><span class="pill slow" id="t-slow"></span>
-          </div>
-          <p id="t-order"></p>
-          <div class="plan-row">
-            <button class="go small" id="apply" type="button" data-t="apply">Apply all orders</button>
-            <button class="ghost small" id="replay" type="button" data-t="replay">Watch the research</button>
-          </div>
-          <small class="muted" id="t-when"></small>
-        </div>
-      </div>
+      <div class="kpi fest"><span data-t="k_fest">Diwali in</span><b id="k-fest">–</b><small id="k-fest-sub"></small></div>
+      <div class="kpi order"><span data-t="k_order">To buy for the festival</span><b id="k-order">–</b><small id="k-order-sub"></small>
+        <button class="go small" id="apply" type="button" data-t="apply" hidden>Place the order</button></div>
     </div>
   </section>
+
+  <hr class="divider">
 
   <section class="body">
     <div class="stock">

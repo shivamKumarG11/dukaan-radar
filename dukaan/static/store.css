@@ -41,11 +41,14 @@ input, select { font: 500 15px var(--body); background: var(--room); color: var(
 .near .shop { font-size: 12.5px; background: var(--raise); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; color: var(--text); }
 .near .shop i { font-style: normal; color: var(--marigold); }
 
-.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: min-content; gap: 12px; }
-.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
-.kpi > span { font-size: 13px; color: var(--muted); }
+.kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.kpi.order > b { color: var(--ok); }
+.kpi.order .go { align-self: flex-start; margin-top: 8px; }
+.divider { border: 0; border-top: 1px solid var(--line); margin: 26px 0 20px; }
+.kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.kpi > span { font-size: 14px; color: var(--muted); }
 .kpi > b { font-family: var(--display); font-size: 30px; font-weight: 800; }
-.kpi > small { font-size: 12.5px; color: var(--muted); }
+.kpi > small { font-size: 13.5px; color: var(--muted); }
 .kpi.warn > b { color: var(--re); }
 .kpi.fest > b { color: var(--marigold); }
 .kpi.plan { grid-column: 1 / -1; padding: 16px 18px; background: linear-gradient(135deg, #2a1d12, var(--panel) 60%); border-color: #4a3520; }
@@ -61,7 +64,7 @@ input, select { font: 500 15px var(--body); background: var(--room); color: var(
 .pill.re { background: rgba(255,122,107,.15); color: var(--re); }
 .pill.slow { background: rgba(111,182,232,.15); color: var(--slow); }
 
-.body { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; margin-top: 16px; align-items: start; }
+.body { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
 .stock-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .stock-head h1 { font-family: var(--display); font-size: 26px; margin: 0 6px 0 0; }
 .stock-head input { flex: 1; min-width: 160px; max-width: 280px; }

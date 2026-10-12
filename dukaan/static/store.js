@@ -9,9 +9,10 @@ let cat = 'All', onlyAction = false, chat = [];
 const T = {
   en: {
     tagline: 'Stock radar', run: 'Run demand research', near_empty: 'Nearby supermarkets appear after research (Google Maps via SerpApi).',
-    k_items: 'Items', k_value: 'Stock value', k_value_sub: 'at cost price', k_low: 'Running low',
+    k_value: 'Stock worth', k_items_sub: (n) => `${n} items on the shelves`, k_low: 'Running low', k_fest: 'Diwali in', k_order: 'To buy for the festival', n_items: (n) => `${n} items`,
+    order_none: 'Press Run demand research', order_sub: (u, n) => `${u} units across ${n} items`, order_done: 'Everything is stocked ✓',
     plan_empty_title: 'No research yet', plan_empty: 'Press Run demand research. Four workers check the 6 key festive-season items against live Google Trends, Shopping and News data for Mumbai, and every item gets a stock check.',
-    apply: 'Apply all orders', replay: 'Watch the research', stock: 'Stock', f_all: 'All', f_act: 'Needs action', add: '+ Add item', reset: 'Reset demo stock',
+    apply: 'Place the order', replay: 'Watch the research', stock: 'Stock', f_all: 'All', f_act: 'Needs action', add: '+ Add item', reset: 'Reset demo stock',
     agent: 'Stock agent', agent_sub: 'Changes stock, reads the research, checks live prices and news',
     close_busy: 'Researching… back to the store', close_done: 'See the plan in the store', cancel: 'Cancel', save: 'Save',
     fl_name: 'Name', fl_hindi: 'Hindi name', fl_cat: 'Category', fl_unit: 'Unit', fl_qty: 'In stock', fl_reorder: 'Normal weekly stock', fl_cost: 'Cost ₹', fl_price: 'Price ₹', fl_term: 'What people Google for it',
@@ -30,7 +31,8 @@ const T = {
   },
   hi: {
     tagline: 'स्टॉक रडार', run: 'मांग की रिसर्च करें', near_empty: 'रिसर्च के बाद आस-पास के सुपरमार्केट दिखेंगे (SerpApi से Google Maps)।',
-    k_items: 'सामान', k_value: 'स्टॉक की कीमत', k_value_sub: 'लागत पर', k_low: 'कम बचा',
+    k_value: 'स्टॉक की कीमत', k_items_sub: (n) => `शेल्फ पर ${n} सामान`, k_low: 'कम बचा', k_fest: 'दिवाली में', k_order: 'त्योहार के लिए खरीदें', n_items: (n) => `${n} सामान`,
+    order_none: 'मांग की रिसर्च करें दबाएँ', order_sub: (u, n) => `${n} सामान, ${u} यूनिट`, order_done: 'सब स्टॉक में है ✓',
     plan_empty_title: 'अभी रिसर्च नहीं हुई', plan_empty: '"मांग की रिसर्च करें" दबाएँ। चार कर्मचारी त्योहार के 6 खास सामान को मुंबई के लाइव Google Trends, Shopping और News डेटा से जाँचेंगे, और हर सामान का स्टॉक देखा जाएगा।',
     apply: 'सारे ऑर्डर लगाएँ', replay: 'रिसर्च देखें', stock: 'स्टॉक', f_all: 'सभी', f_act: 'ध्यान दें', add: '+ सामान जोड़ें', reset: 'डेमो स्टॉक वापस',
     agent: 'स्टॉक एजेंट', agent_sub: 'स्टॉक बदलता है, रिसर्च पढ़ता है, लाइव दाम और खबरें देखता है',
@@ -91,32 +93,23 @@ function spark(values) {
 
 // ---------- render ----------
 function renderTop() {
-  const s = state.summary, items = state.items;
-  $('k-items').textContent = items.length;
-  $('k-cats').textContent = t('cats', new Set(items.map((i) => i.category)).size);
+  const items = state.items;
   $('k-value').textContent = rupees(items.reduce((a, i) => a + i.qty * i.cost, 0));
+  $('k-items').textContent = t('k_items_sub', items.length);
   const low = items.filter((i) => i.qty <= 0.5 * i.reorder);
-  $('k-low').textContent = low.length;
+  $('k-low').textContent = t('n_items', low.length);
   $('k-low-names').textContent = low.length ? low.slice(0, 4).map((i) => (lang === 'hi' && i.hindi) || i.name).join(', ') : t('none_low');
-  $('k-fest-label').textContent = t('diwali');
   $('k-fest').textContent = t('days', state.diwali);
   $('k-fest-sub').textContent = t('fest_sub', lang === 'hi' ? state.festival.hi : state.festival.name, state.festival.days);
-
-  const r = state.research;
-  $('plan-empty').hidden = !!r; $('plan-full').hidden = !r;
-  if (!r) return;
-  let up = 0, re = 0, slow = 0, units = 0, spend = 0;
-  for (const i of items) {
-    const a = advice(i);
-    if (!a) continue;
-    if (a.cls === 'stock_up') up++; else if (a.cls === 'restock') re++; else if (a.cls === 'slow') slow++;
-    units += a.need; spend += a.need * i.cost;
+  if (!state.research) {
+    $('k-order').textContent = '–'; $('k-order-sub').textContent = t('order_none'); $('apply').hidden = true;
+    return;
   }
-  $('t-up').textContent = t('t_up', up); $('t-re').textContent = t('t_re', re); $('t-slow').textContent = t('t_slow', slow);
-  $('t-order').innerHTML = units ? t('t_order', units, rupees(spend)) : t('t_none');
-  $('apply').disabled = !units;
-  const n = (r.budget?.live || 0) + (r.budget?.cached || 0);
-  $('t-when').textContent = t('t_when', new Date(r.date).toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short' }), n);
+  let units = 0, spend = 0, lines = 0;
+  for (const i of items) { const a = advice(i); if (a && a.need) { units += a.need; spend += a.need * i.cost; lines++; } }
+  $('k-order').textContent = rupees(spend);
+  $('k-order-sub').textContent = units ? t('order_sub', units, lines) : t('order_done');
+  $('apply').hidden = !units;
 }
 
 function renderCats() {
@@ -237,7 +230,6 @@ function closeResearch() {
   load();
 }
 $('research').onclick = openResearch;
-$('replay').onclick = openResearch;
 $('close').onclick = closeResearch;
 addEventListener('message', async (e) => {
   if (e.origin !== location.origin || e.data?.type !== 'research-done') return;

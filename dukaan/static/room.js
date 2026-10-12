@@ -22,8 +22,8 @@ const ACTION = {
   hi: { stock_now: 'अभी मंगाएँ', last_call: 'आखिरी मौका', at_peak: 'चरम पर', cooling: 'घट रहा', watch: 'नज़र रखें' },
 };
 const UI = {
-  en: { ready: 'READY', searching: 'SEARCHING…', found: 'FOUND', idle: 'Waiting to research the store', title: "Today's stock plan", start: 'Start research', busy: 'Researching…', again: 'Research again', board: 'Press Start research', writing: 'WRITING THE PLAN', done: 'PLAN READY' },
-  hi: { ready: 'तैयार', searching: 'खोज रहे हैं…', found: 'मिल गया', idle: 'रिसर्च का इंतज़ार', title: 'आज का स्टॉक प्लान', start: 'रिसर्च शुरू करें', busy: 'रिसर्च चल रही है…', again: 'फिर से रिसर्च करें', board: 'रिसर्च शुरू करें दबाएँ', writing: 'प्लान लिख रहे हैं', done: 'प्लान तैयार' },
+  en: { ready: 'READY', searching: 'SEARCHING…', found: 'FOUND', idle: 'Waiting to research the store', title: "Today's stock plan", start: 'Start research', busy: 'Researching…', again: 'Research again', pause: 'Pause', resume: 'Resume', paused: 'PAUSED', board: 'Press Start research', writing: 'WRITING THE PLAN', done: 'PLAN READY' },
+  hi: { ready: 'तैयार', searching: 'खोज रहे हैं…', found: 'मिल गया', idle: 'रिसर्च का इंतज़ार', title: 'आज का स्टॉक प्लान', start: 'रिसर्च शुरू करें', busy: 'रिसर्च चल रही है…', again: 'फिर से रिसर्च करें', pause: 'रोकें', resume: 'जारी रखें', paused: 'रुका हुआ', board: 'रिसर्च शुरू करें दबाएँ', writing: 'प्लान लिख रहे हैं', done: 'प्लान तैयार' },
 };
 const t = (k) => UI[lang][k];
 const wname = (w) => (lang === 'hi' ? w.hi : w.name);
@@ -187,7 +187,6 @@ function frame() {
   mb.position.x = munshi.grp.position.x; mt.position.x = munshi.grp.position.x;
   renderer.render(scene, camera); labels.render(scene, camera);
   requestAnimationFrame(frame);
-if (new URLSearchParams(location.search).get('autostart') === '1') $('pick').requestSubmit();
 }
 
 // ---------- evidence flights ----------
@@ -238,9 +237,13 @@ function meter() { $('meter').textContent = `${counts.live} live · ${counts.cac
 const queue = [];
 let pumping = false;
 function push(ev) { queue.push(ev); if (!pumping) pump(); }
+let paused = false, unpause = null;
 async function pump() {
   pumping = true;
-  while (queue.length) await handle(queue.shift());
+  while (queue.length) {
+    if (paused) await new Promise((r) => (unpause = r));
+    await handle(queue.shift());
+  }
   pumping = false;
 }
 async function handle(ev) {
@@ -331,8 +334,18 @@ function rerenderPlan() {
 
 // ---------- controls ----------
 let source = null;
+function setPaused(v) {
+  paused = v;
+  $('pause').setAttribute('aria-pressed', String(v));
+  $('pause').textContent = v ? t('resume') : t('pause');
+  if (v) setBubble(mBubble, t('paused'), lang === 'hi' ? 'जारी रखें दबाएँ' : 'Press Resume to carry on', false);
+  else { setBubble(mBubble, t('ready'), lang === 'hi' ? 'सबूत आने पर प्लान लिखूँगा' : 'Writes the plan from the evidence', true); if (unpause) { unpause(); unpause = null; } }
+  fetch('/api/research/pause', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paused: v }) }).catch(() => {});
+}
+$('pause').onclick = () => setPaused(!paused);
 function finish() {
   running = false;
+  $('pause').hidden = true; paused = false;
   if (source) { source.close(); source = null; }
   $('go').disabled = false; $('go').textContent = t('again');
 }
@@ -341,6 +354,7 @@ $('pick').addEventListener('submit', (e) => {
   if (running) return;
   running = true;
   $('go').disabled = true; $('go').textContent = t('busy');
+  $('pause').hidden = false; $('pause').textContent = t('pause'); $('pause').setAttribute('aria-pressed', 'false');
   $('hint').hidden = true;
   $('log').innerHTML = ''; $('plan').hidden = true;
   counts = { live: 0, cached: 0 }; meter();

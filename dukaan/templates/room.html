@@ -18,6 +18,7 @@
   <form class="pick" id="pick" aria-label="Research">
     <div class="where"><b>{{ store.name }}</b><span>{{ store.area }} · 50 items</span></div>
     <button class="go" id="go" type="submit">Start research</button>
+    <button class="pause" id="pause" type="button" hidden>Pause</button>
   </form>
   <div class="right">
     <span class="meter" id="meter" aria-live="polite"></span>
@@ -34,7 +35,7 @@
     <div id="fly" class="fly" aria-hidden="true"></div>
     <div class="hint" id="hint">
       <b>Five workers, one job each.</b>
-      <span>They check every item in the store against live Google data for Mumbai. Every speech bubble is a real SerpApi search.</span>
+      <span>They check the store's 6 key festive-season items against live Google data for Mumbai. Every speech bubble is a real SerpApi search.</span>
     </div>
   </section>
 

@@ -10,7 +10,7 @@ const T = {
   en: {
     tagline: 'Stock radar', run: 'Run demand research', near_empty: 'Nearby supermarkets appear after research (Google Maps via SerpApi).',
     k_items: 'Items', k_value: 'Stock value', k_value_sub: 'at cost price', k_low: 'Running low',
-    plan_empty_title: 'No research yet', plan_empty: 'Press Run demand research. Four workers check all 50 items against live Google Trends, Shopping, News and Maps data for Mumbai.',
+    plan_empty_title: 'No research yet', plan_empty: 'Press Run demand research. Four workers check the 6 key festive-season items against live Google Trends, Shopping and News data for Mumbai, and every item gets a stock check.',
     apply: 'Apply all orders', replay: 'Watch the research', stock: 'Stock', f_all: 'All', f_act: 'Needs action', add: '+ Add item', reset: 'Reset demo stock',
     agent: 'Stock agent', agent_sub: 'Changes stock, reads the research, checks live prices and news',
     close_busy: 'Researching… back to the store', close_done: 'See the plan in the store', cancel: 'Cancel', save: 'Save',
@@ -31,7 +31,7 @@ const T = {
   hi: {
     tagline: 'स्टॉक रडार', run: 'मांग की रिसर्च करें', near_empty: 'रिसर्च के बाद आस-पास के सुपरमार्केट दिखेंगे (SerpApi से Google Maps)।',
     k_items: 'सामान', k_value: 'स्टॉक की कीमत', k_value_sub: 'लागत पर', k_low: 'कम बचा',
-    plan_empty_title: 'अभी रिसर्च नहीं हुई', plan_empty: '"मांग की रिसर्च करें" दबाएँ। चार कर्मचारी सभी 50 सामान को मुंबई के लाइव Google Trends, Shopping, News और Maps डेटा से जाँचेंगे।',
+    plan_empty_title: 'अभी रिसर्च नहीं हुई', plan_empty: '"मांग की रिसर्च करें" दबाएँ। चार कर्मचारी त्योहार के 6 खास सामान को मुंबई के लाइव Google Trends, Shopping और News डेटा से जाँचेंगे, और हर सामान का स्टॉक देखा जाएगा।',
     apply: 'सारे ऑर्डर लगाएँ', replay: 'रिसर्च देखें', stock: 'स्टॉक', f_all: 'सभी', f_act: 'ध्यान दें', add: '+ सामान जोड़ें', reset: 'डेमो स्टॉक वापस',
     agent: 'स्टॉक एजेंट', agent_sub: 'स्टॉक बदलता है, रिसर्च पढ़ता है, लाइव दाम और खबरें देखता है',
     close_busy: 'रिसर्च चल रही है… दुकान पर वापस', close_done: 'दुकान में प्लान देखें', cancel: 'रद्द करें', save: 'सेव करें',
@@ -75,6 +75,7 @@ function advice(item) {
     return { p, cls: p.stock, label: p.stock === 'stock_up' ? t('up', need) : t('re', need), need };
   }
   if (p.stock === 'slow') return { p, cls: 'slow', label: t('slow'), need: 0 };
+  if (!p.researched) return null;  // only the focus items were searched
   return { p, cls: 'ok', label: t('ok'), need: 0 };
 }
 function needsAction(item) {
@@ -231,6 +232,7 @@ function openResearch() {
 }
 function closeResearch() {
   $('overlay').hidden = true; $('room').src = 'about:blank';
+  fetch('/api/research/pause', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ paused: false }) }).catch(() => {});
   document.body.style.overflow = '';
   load();
 }

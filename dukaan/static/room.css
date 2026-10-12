@@ -86,3 +86,5 @@ button { cursor: pointer; }
   .side { height: auto; }
   .bubble { width: 170px; }
 }
+.pause { background: transparent; color: var(--text); border: 1px solid #4a3a31; padding: 0 18px; }
+.pause[aria-pressed="true"] { background: var(--text); color: var(--night); }

@@ -1,8 +1,9 @@
-"""Demand research for the whole supermarket: every item in stock, checked against live search data.
+"""Demand research for the supermarket: the key festive-season items (FOCUS) are checked against live
+search data; every other item gets the plain stock rule (restock when down to half of normal).
 
-Searches for a fresh run (cached afterwards):
-  Google Trends, Maharashtra, this season      1 call per 5 items          12 h
-  Google Trends, Maharashtra, last season      1 call per 5 items          30 days
+Searches for a fresh run, about 10 (cached afterwards):
+  Google Trends, Maharashtra, this season      1 call per 5 focus items    12 h
+  Google Trends, Maharashtra, last season      1 call per 5 focus items    30 days
   Google Shopping, Mumbai                      top movers (PRICE_CHECKS)   24 h
   Google News                                  1 call for the top movers   12 h
   Google Maps, supermarkets near the store     1 call                      7 days
@@ -14,6 +15,7 @@ and capped per category: a festival spike in "rangoli" searches is real extra de
 "salt" searches is not people eating three times the salt. Order = what it takes to reach that target.
 """
 import math
+import threading
 from datetime import date, timedelta
 
 from . import inventory, serp, signals
@@ -21,7 +23,12 @@ from .config import ANCHOR, FESTIVALS, next_festival
 from .report import TOP_PICKS, _action, _price_line, _score, hi_date
 from .store_seed import STORE
 
-PRICE_CHECKS = 6
+PRICE_CHECKS = 4
+# the items worth searching for in the run-up to Diwali: festive, sweets, a staple, a slow mover
+RUNNING = threading.Lock()  # one research run at a time
+GO = threading.Event()      # cleared = paused between searches
+GO.set()
+FOCUS = ["Diyas", "Rangoli colours", "Kaju katli", "Ghee", "Sugar", "Cold drink"]
 # how far search signals may raise demand above normal, by category
 CAPS = {"Staples": 1.3, "Oils & ghee": 1.3, "Dairy & bakery": 1.2, "Fruits & veg": 1.3, "Beverages": 1.3,
         "Household": 1.3, "Snacks & sweets": 2.5, "Festive & pooja": 3.0}
@@ -49,6 +56,7 @@ def build(today=None, allow_live=None, listener=None):
     errors = []
 
     def S(params, ttl):
+        GO.wait(timeout=600)  # paused from the Research Room (a forgotten pause ends after 10 min)
         try:
             return serp.search(params, ttl_hours=ttl, tally=tally, allow_live=allow_live)
         except Exception as e:
@@ -63,7 +71,8 @@ def build(today=None, allow_live=None, listener=None):
     start = anchor_ly - timedelta(days=max(days_to_anchor, 0) + 21)
     end = anchor_ly + timedelta(days=3)
 
-    terms = list(dict.fromkeys(r["term"] for r in rows))
+    focus = {r["id"] for r in rows if r["name"] in FOCUS}
+    terms = list(dict.fromkeys(r["term"] for r in rows if r["id"] in focus))
     now_series, ly_series = {}, {}
     for i in range(0, len(terms), 5):
         q = ",".join(terms[i:i + 5])
@@ -75,13 +84,14 @@ def build(today=None, allow_live=None, listener=None):
     for r in rows:
         m, recent, base = signals.momentum(now_series.get(r["term"], []))
         replay = signals.season_replay(ly_series.get(r["term"], []), anchor_ly, days_to_anchor) if r["term"] in ly_series else None
-        weak = (recent or 0) < 2 and (replay or {}).get("peak", 0) < 10
+        researched = r["id"] in focus
+        weak = researched and (recent or 0) < 2 and (replay or {}).get("peak", 0) < 10
         until_peak = days_to_anchor - replay["peak_days_before"] if replay else None
         f = _demand_factor(m, replay, until_peak, weak, CAPS.get(r["category"], 1.3))
         target = math.ceil(r["reorder"] * f)
         p = dict(id=r["id"], name=r["name"], hi=r["hindi"], term=r["term"], category=r["category"], unit=r["unit"],
                  qty=r["qty"], reorder=r["reorder"], price_ours=r["price"], image=r["image"],
-                 momentum=m, recent=recent, replay=replay, score=_score(m, replay, recent), weak=weak, demand=f, target=target,
+                 researched=researched, momentum=m, recent=recent, replay=replay, score=_score(m, replay, recent), weak=weak, demand=f, target=target,
                  spark=[v for _, v, _ in now_series.get(r["term"], [])][-63:])
         p["action"], p["action_en"], p["action_hi"] = _action(p, (anchor_now, ANCHOR, anchor_hi), today)
         if f >= 1.25 and target > r["qty"]:
@@ -94,7 +104,10 @@ def build(today=None, allow_live=None, listener=None):
             p["stock"], p["order"] = "slow", 0
         else:
             p["stock"], p["order"] = "ok", 0
-            if weak:
+            if not researched:
+                p["action_en"] = "Not in this research. Stock is above half of normal, so nothing to do."
+                p["action_hi"] = "इस रिसर्च में नहीं। स्टॉक सामान्य के आधे से ज़्यादा है, कुछ करने की ज़रूरत नहीं।"
+            elif weak:
                 p["action_en"] = "Too few searches in Maharashtra to read demand. Keep the normal stock."
                 p["action_hi"] = "महाराष्ट्र में खोजें बहुत कम हैं, मांग का अंदाज़ा नहीं। सामान्य स्टॉक रखें।"
             elif f >= 1.25:

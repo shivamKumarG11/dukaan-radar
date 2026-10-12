@@ -1,13 +1,13 @@
 # Dukaan Radar
 
-**A stock radar for one supermarket in Dadar, Mumbai.** The store keeps 50 items. Press *Run demand research*, and four 3D workers check every item against live Google search data via SerpApi: Trends for Maharashtra, last season's Diwali curve, Shopping prices in Mumbai, News, and Maps for nearby supermarkets. Every item then gets a call: **Stock up +N**, **Restock +N**, **Slow down** or **OK**, with the reason in English and Hindi. A stock agent, an LLM with tools, changes the stock when you tell it what came in, answers "what should I order for Diwali?" from the research, and looks up live prices and news.
+**A stock radar for one supermarket in Dadar, Mumbai.** The store keeps 50 items. Press *Run demand research*, and four 3D workers check the 6 key festive-season items against live Google search data via SerpApi: Trends for Maharashtra, last season's Diwali curve, Shopping prices in Mumbai, News, and Maps for nearby supermarkets. Every item then gets a call: **Stock up +N**, **Restock +N**, **Slow down** or **OK**, with the reason in English and Hindi. A stock agent, an LLM with tools, changes the stock when you tell it what came in, answers "what should I order for Diwali?" from the research, and looks up live prices and news.
 
 Built for the SerpApi India Hackathon 2026.
 
 ## What it does
 
 - **Store page:** shows the store on Google Maps, plus KPIs (stock value, items running low, days to Diwali). It also has the stock grid: product photos, quantity −/+, add, edit and remove.
-- **Research:** a run takes 28 SerpApi searches the first time and is cached afterwards. It opens the 3D Research Room, where each speech bubble is a real search, and Munshi writes the plan on the chalkboard. Back in the store, every card shows its call and its evidence (a Trends sparkline and the reason).
+- **Research:** about 10 SerpApi searches for the 6 focus items (cached afterwards), one run at a time, with a pause button. Every other item gets a stock check (restock at half of normal or less). It opens the 3D Research Room, where each speech bubble is a real search, and Munshi writes the plan on the chalkboard. Back in the store, every card shows its call and its evidence (a Trends sparkline and the reason).
 - **Apply all orders:** receives the recommended quantities into stock. It works from the stock as it is now, so a second press orders nothing more.
 - **Stock agent** (TokenRouter, any OpenAI-compatible model). Its tools:
   - list, get and change stock; add or remove items

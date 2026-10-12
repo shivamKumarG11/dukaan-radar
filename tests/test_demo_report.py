@@ -71,13 +71,13 @@ from dukaan.app import app
 c = TestClient(app)
 events = [json.loads(l[6:]) for l in c.get('/api/research').text.splitlines() if l.startswith('data: ')]
 done = [e for e in events if e['type'] == 'search' and e['phase'] == 'done']
-assert len(done) == 28 and all(e['source'] == 'cache' for e in done)
+assert len(done) == 10 and all(e['source'] == 'cache' for e in done)
 assert {e['worker'] for e in done} == {'scout', 'historian', 'price', 'news'}
 r = events[-1]['report']
 assert events[-1]['type'] == 'report' and not r['errors'] and len(r['recs']) == 50
-assert r['totals']['stock_up'] >= 10 and r['totals']['restock'] >= 3 and len(r['competitors']) >= 5
+assert r['totals']['stock_up'] >= 3 and r['totals']['restock'] >= 3 and len(r['competitors']) >= 5
 assert {p['stock'] for p in r['recs'] if p['category'] == 'Staples' and p['name'] == 'Salt'} <= {'ok', 'slow'}
-assert all(p['action_en'] and p['action_hi'] for p in r['recs'])
+assert all(p['action_en'] and p['action_hi'] for p in r['recs']) and sum(p['researched'] for p in r['recs']) == 6
 assert c.get('/api/store').json()['research']['date'] == '2026-10-12'
 applied = c.post('/api/orders/apply', json={}).json()
 assert len(applied['done']) == r['totals']['stock_up'] + r['totals']['restock']

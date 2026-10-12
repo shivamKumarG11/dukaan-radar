@@ -103,6 +103,10 @@ def api_reset():
 @app.get("/api/research")
 def api_research():
     """Server-sent events: each search as a worker starts and finishes it, then the full report."""
+    if not research.RUNNING.acquire(blocking=False):
+        busy = dict(type="error", message="A research run is already going on. Wait for it to finish.")
+        return StreamingResponse(iter(["data: " + json.dumps(busy) + "\n\n"]), media_type="text/event-stream")
+    research.GO.set()
     events = queue.Queue()
 
     def work():
@@ -115,15 +119,27 @@ def api_research():
             events.put(dict(type="report", report=r))
         except Exception as e:
             events.put(dict(type="error", message=str(e)))
+        finally:
+            research.GO.set()
+            research.RUNNING.release()
         events.put(None)
 
     threading.Thread(target=work, daemon=True).start()
 
     def stream():
-        while (ev := events.get()) is not None:
-            yield "data: " + json.dumps(ev, ensure_ascii=False, default=str) + "\n\n"
+        try:
+            while (ev := events.get()) is not None:
+                yield "data: " + json.dumps(ev, ensure_ascii=False, default=str) + "\n\n"
+        finally:
+            research.GO.set()  # the viewer left: never stay paused
 
     return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
+
+
+@app.post("/api/research/pause")
+def api_pause(body: dict = Body(default={})):
+    research.GO.clear() if body.get("paused", True) else research.GO.set()
+    return dict(paused=not research.GO.is_set())
 
 
 # ---------- agent ----------

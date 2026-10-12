@@ -143,10 +143,19 @@ def api_pause(body: dict = Body(default={})):
 
 
 # ---------- agent ----------
+AGENT_USE = {}
 @app.post("/api/agent")
 def api_agent(body: dict = Body(...)):
     if not os.environ.get("TOKENROUTER_API_KEY"):
         return dict(reply="The stock agent needs TOKENROUTER_API_KEY in .env (any OpenAI-compatible model works).", actions=[], trace=[])
+    limit = int(os.environ.get("AGENT_DAILY_LIMIT") or 0)  # set on public deployments to cap model spend
+    if limit:
+        day = date.today().isoformat()
+        if AGENT_USE.get("day") != day:
+            AGENT_USE.update(day=day, n=0)
+        if AGENT_USE["n"] >= limit:
+            return dict(reply="The demo agent has reached today's message limit. Please try again tomorrow.", actions=[], trace=[])
+        AGENT_USE["n"] += 1
     _load_last()
     try:
         return agent.chat(body.get("messages", []))

@@ -1,0 +1,11 @@
+.env
+.venv
+.git
+cache
+data
+scripts/shots
+scripts/server.log
+scripts/research_stream.txt
+**/__pycache__
+.pytest_cache
+docs
